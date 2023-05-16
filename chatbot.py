@@ -1,6 +1,6 @@
 import requests
 import json
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import nltk
 from nltk.chat.util import Chat, reflections
 
@@ -111,29 +111,48 @@ def chat():
         job_ok = False
         obrigatory = False
         interest = False
-        return "Olá. Seja bem vindo ao chatbot do SiDi. Me chamo SidX! Qual o código da sua vaga?"
+
+        data = "Olá. Seja bem vindo ao chatbot do SiDi. Me chamo SidX! Qual o código da sua vaga?"
+        response = jsonify(data)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     if (message.lower() == 'tchau' or  message.lower() == 'xau' or message.lower() == 'chau' or message.lower() == 'adeus' or message.lower() == 'bye'):
         restart_application()
-        return "Até a próxima!"
+        data = 'Até a próxima!'
+        response = jsonify(data)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     
     resposta = chatbot.respond(message)
 
     if (resposta):
-        return str(resposta)
+        response = jsonify(resposta)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
     else:
         if started == False and job_ok == False and obrigatory == False and interest == False:
             started = True
-            return "Olá. Seja bem vindo ao chatbot do SiDi. Me chamo SidX! Qual o código da sua vaga?"
+            
+            data = "Olá. Seja bem vindo ao chatbot do SiDi. Me chamo SidX! Qual o código da sua vaga?"
+            response = jsonify(data)
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            return response
 
         if started == True and job_ok == False and obrigatory == False and interest == False:
             if tries >= 3:
                 restart_application()
-                return "Não foi possível prosseguir. Tente mais tarde"
+                data = "Não foi possível prosseguir. Tente mais tarde"
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
 
             check = check_job_id(message)
             if check == False:
                 tries += 1
-                return "Código da vaga não existe. Por favor, verifique e informe novamente."
+                data = "Código da vaga não existe. Por favor, verifique e informe novamente."
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
             else:
                 questions = get_job_questions(message)
                 job_ok = True
@@ -149,7 +168,10 @@ def chat():
 
                 if elim_count - 1 < len(elim_questions):
                     elim_count += 1
-                    return "Ótimo! Agora vamos seguir para as perguntas da vaga. Responda 1 para SIM e 0 para NÃO para as seguintes perguntas. " + elim_questions[elim_count - 1]['pergunta']
+                    data = "Ótimo! Agora vamos seguir para as perguntas da vaga. Responda 1 para SIM e 0 para NÃO para as seguintes perguntas. " + elim_questions[elim_count - 1]['pergunta']
+                    response = jsonify(data)
+                    response.headers['Access-Control-Allow-Origin'] = '*'
+                    return response
 
         if started == True and job_ok == True and obrigatory == False and interest == False:
 
@@ -163,40 +185,61 @@ def chat():
             
             if elim_count - 1 < len(elim_questions) - 1:
                 elim_count += 1
-                return elim_questions[elim_count - 1]['pergunta']
+                data = elim_questions[elim_count - 1]['pergunta']
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
             else:
                 for a in answers:
                     if a == False:
                         rejected = True
                 if rejected == True:
                     restart_application()
-                    return "Esse conhecimento é obrigatório para essa vaga. Tente outras vagas disponíveis."
+                    data = "Esse conhecimento é obrigatório para essa vaga. Tente outras vagas disponíveis."
+                    response = jsonify(data)
+                    response.headers['Access-Control-Allow-Origin'] = '*'
+                    return response
                 else:
                     obrigatory = True
                     if obri_count - 1 < len(obri_questions) - 1:
                         obri_count += 1
-                        return "Ok! Agora responda as seguintes perguntas: " + obri_questions[obri_count - 1]['pergunta']
+                        data = "Ok! Agora responda as seguintes perguntas: " + obri_questions[obri_count - 1]['pergunta']
+                        response = jsonify(data)
+                        response.headers['Access-Control-Allow-Origin'] = '*'
+                        return response
                     
         if started == True and job_ok == True and obrigatory == True and interest == False:
 
             answers.append(str(message))
             if obri_count - 1 < len(obri_questions) - 1:
                 obri_count += 1
-                return obri_questions[obri_count - 1]['pergunta']
+                data = obri_questions[obri_count - 1]['pergunta']
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
             
             else:
                 interest = True
-                return "Confirmar sua aplicação à vaga? Digite 1 para SIM e 0 para NÃO."
+                data = "Confirmar sua aplicação à vaga? Digite 1 para SIM e 0 para NÃO."
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
             
         if started == True and job_ok == True and obrigatory == True and interest == True:
 
             if bool(int(message)) == True:
                 job_application(answers, job_id)
                 restart_application()
-                return "Sua candidatura a vaga foi registrada com sucesso. Obrigado por participar. :D"
+                data = "Sua candidatura a vaga foi registrada com sucesso. Obrigado por participar. :D"
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
             else:
                 restart_application()
-                return "Confirmado sua desistência da vaga."
+                data = "Confirmado sua desistência da vaga."
+                response = jsonify(data)
+                response.headers['Access-Control-Allow-Origin'] = '*'
+                return response
 
 
 
