@@ -107,10 +107,8 @@ def chat():
     message = str(msg['mensagem'])
 
     if (message.lower() == 'iniciar' or  message.lower() == 'inicia' or message.lower() == 'inicio' or message.lower() == 'inici' or message.lower() == 'start'):
+        restart_application()
         started = True
-        job_ok = False
-        obrigatory = False
-        interest = False
 
         data = "Olá. Seja bem vindo ao chatbot do SiDi. Me chamo SidX! Qual o código da sua vaga?"
         response = jsonify(data)
